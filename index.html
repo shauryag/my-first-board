@@ -1,9 +1,31 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Test Page</title>
-  </head>
-  <body>
-    <h1>Hello, Yashvi!</h1>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yashvi Homeboard</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <h1>Yashvi Homeboard</h1>
+  </header>
+
+  <!-- Two Weeks Grid -->
+  <div class="planner-grid" id="planner"></div>
+
+  <!-- Special Notes Section -->
+  <h2>Special Notes</h2>
+  <div class="special-notes" id="specialNotes"></div>
+
+  <!-- Dialog for Editing -->
+  <div class="dialog" id="noteDialog">
+    <textarea id="noteContent"></textarea>
+    <input type="color" id="noteColor"/>
+    <button id="saveNote">Save</button>
+    <button id="closeDialog">Close</button>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
 </html>

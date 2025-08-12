@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 // Replace with your Supabase credentials
 const SUPABASE_URL = 'https://kspgpdjkcwgctvkglgpr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzcGdwZGprY3dnY3R2a2dsZ3ByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTgxMTUsImV4cCI6MjA3MDQ5NDExNX0.TdAPwulNmAcgMdBFDLbL1LTyKLOVTAN2YVn1pksORtk';
-
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const planner = document.getElementById('planner');
