@@ -1,61 +1,56 @@
-:root {
-    --border-color: #e2e8f0;
-    --grid-hover: #f8fafc;
-    --homework-color: #e3f2fd;
-    --test-color: #fff3e0;
-    --exam-color: #ffebee;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yashvi Homeboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <h1>📚 Yashvi Homeboard</h1>
+        <div class="nav">
+            <button id="prevBtn" class="btn">◀</button>
+            <div id="monthLabel" class="month-label"></div>
+            <button id="nextBtn" class="btn">▶</button>
+        </div>
+    </header>
 
-.grid-container {
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
+    <div class="grid-container">
+        <div id="weekdayRow" class="weekday-row"></div>
+        <div id="grid" class="grid"></div>
+    </div>
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 1px;
-    background: var(--border-color);
-    border: 1px solid var(--border-color);
-}
+    <section class="special-notes">
+        <h2>⭐ Special Notes</h2>
+        <div id="specialNote" class="special-grid"></div>
+    </section>
 
-.grid-cell {
-    min-height: 100px;
-    background: white;
-    padding: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal" hidden>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <button id="closeModal" class="btn-close">×</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="noteText" placeholder="Enter your note..."></textarea>
+                <div class="color-picker">
+                    <label>Type:</label>
+                    <select id="noteType">
+                        <option value="homework">Homework</option>
+                        <option value="test">Test</option>
+                        <option value="exam">Exam</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="deleteNote" class="btn btn-danger">Delete</button>
+                <button id="saveNote" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
 
-.grid-cell:hover {
-    background: var(--grid-hover);
-}
-
-.grid-cell[data-type="homework"] {
-    background: var(--homework-color);
-}
-
-.grid-cell[data-type="test"] {
-    background: var(--test-color);
-}
-
-.grid-cell[data-type="exam"] {
-    background: var(--exam-color);
-}
-
-.modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    z-index: 1000;
-}
-
-/* Add remaining styles from previous CSS */
+    <script type="module" src="app.js"></script>
+</body>
+</html>
