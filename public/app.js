@@ -1,4 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
 
 // 🔹 Replace with your own Supabase project credentials
 const SUPABASE_URL = 'https://kspgpdjkcwgctvkglgpr.supabase.co';
