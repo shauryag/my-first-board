@@ -26,10 +26,7 @@ async function init() {
         renderGrid(currentStartDate);
     });
     document.getElementById('startDate').addEventListener('change', (e) => {
-        const selectedDate = new Date(e.target.value);
-        const selectedDay = selectedDate.getDay();
-        const selectedDiff = selectedDate.getDate() - selectedDay + (selectedDay === 0 ? -6 : 1);
-        currentStartDate = new Date(selectedDate.setDate(selectedDiff));
+        currentStartDate = new Date(e.target.value);
         renderGrid(currentStartDate);
     });
 
@@ -37,11 +34,16 @@ async function init() {
     document.getElementById('cancel').addEventListener('click', () => modal.style.display = 'none');
     document.getElementById('save').addEventListener('click', saveEntry);
 
+    // Event delegation for dynamic cells
     document.addEventListener('click', (e) => {
-        if (e.target.closest('.cell') || e.target.closest('.notes')) {
-            const element = e.target.closest('.cell') || e.target.closest('.notes');
+        const cell = e.target.closest('.cell');
+        const notes = e.target.closest('.notes');
+        if (cell || notes) {
+            const element = cell || notes;
             const date = element.dataset.date;
-            const content = element.querySelector('.content') ? element.querySelector('.content').innerText : document.getElementById('notes-content').innerText;
+            const content = element.querySelector('.content') 
+                ? element.querySelector('.content').innerText 
+                : document.getElementById('notes-content').innerText;
             const type = element.dataset.type || '';
 
             document.getElementById('content').value = content === 'Enter notes...' ? '' : content;
