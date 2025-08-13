@@ -210,3 +210,56 @@ async function saveEntry() {
 }
 
 init();
+
+// This function now takes the user object to get the profile data
+function updateUI(user) {
+    const signInBtn = document.getElementById('sign-in-btn');
+    const signOutBtn = document.getElementById('sign-out-btn');
+    const header = document.getElementById('header');
+
+    // Remove any previously created elements
+    const userDisplay = document.getElementById('user-display');
+    if (userDisplay) {
+        userDisplay.remove();
+    }
+
+    if (user) {
+        signInBtn.style.display = 'none';
+        signOutBtn.style.display = 'inline-block';
+
+        // Get the user's profile data
+        const profilePicture = user.user_metadata.avatar_url;
+        const userName = user.user_metadata.full_name;
+
+        // Create a new div to display the user's info
+        const displayContainer = document.createElement('div');
+        displayContainer.id = 'user-display';
+        displayContainer.style.display = 'flex';
+        displayContainer.style.alignItems = 'center';
+        displayContainer.style.gap = '10px';
+
+        // Add the profile picture
+        const profileImg = document.createElement('img');
+        profileImg.src = profilePicture;
+        profileImg.alt = userName;
+        profileImg.style.width = '40px';
+        profileImg.style.height = '40px';
+        profileImg.style.borderRadius = '50%';
+        profileImg.style.marginLeft = '10px';
+
+        // Add the user's name
+        const greeting = document.createElement('span');
+        greeting.innerText = `Welcome, ${userName.split(' ')[0]}!`;
+
+        // Append the elements to the container
+        displayContainer.appendChild(profileImg);
+        displayContainer.appendChild(greeting);
+        
+        // Append the container to the header or nav
+        document.getElementById('nav').prepend(displayContainer);
+
+    } else {
+        signInBtn.style.display = 'inline-block';
+        signOutBtn.style.display = 'none';
+    }
+}
