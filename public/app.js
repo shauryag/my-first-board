@@ -32,7 +32,7 @@ async function init() {
 
     await renderGrid(currentStartDate);
     await loadNotes();
-    await renderReminders(); // NEW: Call the reminder function on init
+    await renderReminders();
 
     document.getElementById('prev').addEventListener('click', () => {
         currentStartDate.setDate(currentStartDate.getDate() - 14);
@@ -68,11 +68,17 @@ async function init() {
                 content = document.getElementById('notes-content').innerText;
                 document.querySelector('.modal-content label[for="type"]').style.display = 'none';
                 document.getElementById('type').style.display = 'none';
+                // NEW: Hide reminder checkbox for notes
+                document.getElementById('reminder-label').style.display = 'none';
             } else {
                 content = element.querySelector('.content').innerText;
                 type = element.dataset.type || '';
                 document.querySelector('.modal-content label[for="type"]').style.display = 'block';
                 document.getElementById('type').style.display = 'block';
+                // NEW: Show reminder checkbox for grid cells
+                document.getElementById('reminder-label').style.display = 'flex';
+                // NEW: Set checkbox state based on saved data
+                document.getElementById('set-reminder').checked = element.dataset.reminder === 'true';
             }
 
             document.getElementById('content').value = (content === 'Enter notes...') ? '' : content;
@@ -162,7 +168,8 @@ async function renderGrid(startDate) {
     table.appendChild(tbody);
     gridContainer.appendChild(table);
     
-    const { data, error } = await supabase.from('homeboard_entries').select('*').in('date', dates);
+    // NEW: Include 'reminder_set' in the select query
+    const { data, error } = await supabase.from('homeboard_entries').select('*, reminder_set').in('date', dates);
     if (error) console.error(error);
     if (data) {
         data.forEach(entry => {
@@ -170,83 +177,7 @@ async function renderGrid(startDate) {
             if (cell) {
                 cell.querySelector('.content').innerText = entry.content || '';
                 cell.dataset.type = entry.type || '';
+                // NEW: Set the dataset attribute for reminder
+                cell.dataset.reminder = entry.reminder_set || false;
                 cell.classList.remove('red', 'yellow');
-                if (entry.type === 'exam') cell.classList.add('red');
-                else if (entry.type === 'test') cell.classList.add('yellow');
-            }
-        });
-    }
-}
-
-async function loadNotes() {
-    let { data, error } = await supabase.from('special_notes').select('*').eq('id', 1);
-    if (error) console.error(error);
-    if (data && data.length > 0) {
-        document.getElementById('notes-content').innerText = data[0].content || 'Enter notes...';
-    } else {
-        await supabase.from('special_notes').upsert({ id: 1, content: 'Enter notes...' }, { onConflict: 'id' });
-        document.getElementById('notes-content').innerText = 'Enter notes...';
-    }
-}
-
-async function saveEntry() {
-    const modal = document.getElementById('modal');
-    const date = modal.dataset.date;
-    const content = document.getElementById('content').value || '';
-    const type = document.getElementById('type').value;
-
-    if (date === 'notes') {
-        const { error } = await supabase.from('special_notes').upsert({ id: 1, content: content || 'Enter notes...' }, { onConflict: 'id' });
-        if (error) console.error(error);
-        document.getElementById('notes-content').innerText = content || 'Enter notes...';
-    } else {
-        const { error } = await supabase.from('homeboard_entries').upsert({ date, content, type }, { onConflict: 'date' });
-        if (error) console.error(error);
-        const cell = document.querySelector(`.cell[data-date="${date}"]`);
-        if (cell) {
-            cell.querySelector('.content').innerText = content;
-            cell.dataset.type = type;
-            cell.classList.remove('red', 'yellow');
-            if (type === 'exam') cell.classList.add('red');
-            else if (type === 'test') cell.classList.add('yellow');
-        }
-    }
-    modal.style.display = 'none';
-    await renderReminders(); // NEW: Call the reminder function after saving
-}
-
-// NEW FUNCTION TO RENDER REMINDERS
-async function renderReminders() {
-    const { data, error } = await supabase
-        .from('homeboard_entries')
-        .select('date, content, type')
-        .or('type.eq.exam,type.eq.test') // Filter for exams or tests
-        .order('date', { ascending: true }); // Order by date
-
-    if (error) {
-        console.error('Error fetching reminders:', error);
-        return;
-    }
-
-    const remindersList = document.getElementById('reminders-list');
-    remindersList.innerHTML = ''; // Clear previous list
-
-    if (data && data.length > 0) {
-        data.forEach(entry => {
-            const li = document.createElement('li');
-            const dateObj = new Date(entry.date);
-            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            
-            li.innerHTML = `
-                <span class="reminder-type-${entry.type}">(${entry.type.toUpperCase()})</span>
-                <span class="reminder-date">${formattedDate}:</span>
-                <span>${entry.content}</span>
-            `;
-            remindersList.appendChild(li);
-        });
-    } else {
-        remindersList.innerHTML = '<li>No upcoming exams or tests!</li>';
-    }
-}
-
-init();
+                if (entry.type
