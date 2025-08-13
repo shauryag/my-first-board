@@ -47,27 +47,27 @@ function renderGrid() {
     date.setDate(start.getDate() + i);
 
     const dateStr = date.toISOString().split('T')[0];
-    const note = notesData[dateStr];
+    const note = notesData[dateStr] || { text: '', tag: 'none' };
 
     const cell = document.createElement('div');
     cell.className = 'cell';
-    if (note?.tag && note.tag !== 'none') {
-      cell.classList.add(`tag-${note.tag}`);
-    }
     if (date.toDateString() === new Date().toDateString()) {
       cell.classList.add('today');
     }
 
     cell.innerHTML = `
-      <div class="date">${date.getDate()}</div>
-      ${note?.text ? `<div class="note-preview">${note.text}</div>` : ''}
+      <div class="cell-head">
+        <span class="date">${date.getDate()}</span>
+        <span class="weekday">${date.toLocaleString('default', { weekday: 'short' })}</span>
+        ${note.tag !== 'none' ? `<span class="tag tag-${note.tag}">${note.tag}</span>` : ''}
+      </div>
+      <div class="preview">${note.text ? note.text : ''}</div>
     `;
 
     cell.addEventListener('click', () => openModal(date));
     grid.appendChild(cell);
   }
 }
-
 // Modal logic
 function openModal(date) {
   selectedDate = date;
