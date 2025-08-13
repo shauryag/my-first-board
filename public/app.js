@@ -12,7 +12,6 @@ async function init() {
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Start of the week (Monday)
     currentStartDate = new Date(today.setDate(diff));
-    document.getElementById('startDate').value = currentStartDate.toISOString().split('T')[0];
 
     await renderGrid(currentStartDate);
     await loadNotes();
@@ -21,10 +20,12 @@ async function init() {
         currentStartDate.setDate(currentStartDate.getDate() - 14);
         renderGrid(currentStartDate);
     });
+
     document.getElementById('next').addEventListener('click', () => {
         currentStartDate.setDate(currentStartDate.getDate() + 14);
         renderGrid(currentStartDate);
     });
+
     document.getElementById('startDate').addEventListener('change', (e) => {
         currentStartDate = new Date(e.target.value);
         renderGrid(currentStartDate);
@@ -34,30 +35,32 @@ async function init() {
     document.getElementById('cancel').addEventListener('click', () => modal.style.display = 'none');
     document.getElementById('save').addEventListener('click', saveEntry);
 
-    // Event delegation for dynamic cells
-    document.addEventListener('click', (e) => {
+    // Event delegation for dynamic cells and notes section
+    document.addEventListener('click', async (e) => {
         const cell = e.target.closest('.cell');
         const notes = e.target.closest('.notes');
+
         if (cell || notes) {
             const element = cell || notes;
             const date = element.dataset.date;
-            const content = element.querySelector('.content') 
-                ? element.querySelector('.content').innerText 
-                : document.getElementById('notes-content').innerText;
-            const type = element.dataset.type || '';
-
-            document.getElementById('content').value = content === 'Enter notes...' ? '' : content;
-            document.getElementById('type').value = type;
-            modal.dataset.date = date;
+            
+            let content = '';
+            let type = '';
 
             if (date === 'notes') {
+                content = document.getElementById('notes-content').innerText;
                 document.querySelector('.modal-content label[for="type"]').style.display = 'none';
                 document.getElementById('type').style.display = 'none';
             } else {
+                content = element.querySelector('.content').innerText;
+                type = element.dataset.type || '';
                 document.querySelector('.modal-content label[for="type"]').style.display = 'block';
                 document.getElementById('type').style.display = 'block';
             }
 
+            document.getElementById('content').value = (content === 'Enter notes...') ? '' : content;
+            document.getElementById('type').value = type;
+            modal.dataset.date = date;
             modal.style.display = 'block';
         }
     });
@@ -77,14 +80,20 @@ async function renderGrid(startDate) {
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const dates = [];
 
     for (let w = 0; w < 2; w++) {
         const weekStart = new Date(startDate);
         weekStart.setDate(weekStart.getDate() + w * 7);
+
         const tr = document.createElement('tr');
         const weekLabel = document.createElement('th');
-        weekLabel.innerText = `Week ${w + 1} (${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(weekStart.setDate(weekStart.getDate() + 6)).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
+        
+        // Correctly calculate the end date of the week for the label
+        const weekEnd = new Date(weekStart);
+        weekEnd.setDate(weekEnd.getDate() + 6);
+        
+        weekLabel.innerText = `Week ${w + 1} (${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`;
         weekLabel.rowSpan = 1;
         tr.appendChild(weekLabel);
 
@@ -92,6 +101,7 @@ async function renderGrid(startDate) {
             const cellDate = new Date(weekStart);
             cellDate.setDate(cellDate.getDate() + d);
             const dateStr = cellDate.toISOString().split('T')[0];
+            dates.push(dateStr);
             const td = document.createElement('td');
             td.classList.add('cell');
             td.dataset.date = dateStr;
@@ -102,9 +112,8 @@ async function renderGrid(startDate) {
     }
     table.appendChild(tbody);
     gridContainer.appendChild(table);
-
-    const dates = [];
-    document.querySelectorAll('.cell').forEach(cell => dates.push(cell.dataset.date));
+    
+    // Load data from Supabase after grid is rendered
     const { data, error } = await supabase.from('homeboard_entries').select('*').in('date', dates);
     if (error) console.error(error);
     if (data) {
@@ -124,11 +133,11 @@ async function renderGrid(startDate) {
 async function loadNotes() {
     let { data, error } = await supabase.from('special_notes').select('*').eq('id', 1);
     if (error) console.error(error);
-    if (data.length === 0) {
-        await supabase.from('special_notes').insert({ id: 1, content: 'Enter notes...' });
-        document.getElementById('notes-content').innerText = 'Enter notes...';
-    } else {
+    if (data && data.length > 0) {
         document.getElementById('notes-content').innerText = data[0].content || 'Enter notes...';
+    } else {
+        await supabase.from('special_notes').upsert({ id: 1, content: 'Enter notes...' }, { onConflict: 'id' });
+        document.getElementById('notes-content').innerText = 'Enter notes...';
     }
 }
 
