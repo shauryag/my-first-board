@@ -8,6 +8,23 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentStartDate;
 
 async function init() {
+    // Check for an active session on page load
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+        updateUI(session.user);
+    } else {
+        updateUI(null);
+    }
+
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+        if (session) {
+            updateUI(session.user);
+        } else {
+            updateUI(null);
+        }
+    });
+
     let today = new Date();
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
@@ -63,6 +80,35 @@ async function init() {
             modal.style.display = 'block';
         }
     });
+    
+    // Add event listeners for the new buttons
+    document.getElementById('sign-in-btn').addEventListener('click', () => {
+        supabase.auth.signInWithOAuth({
+            provider: 'google',
+        });
+    });
+
+    document.getElementById('sign-out-btn').addEventListener('click', async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) console.error(error);
+    });
+}
+
+// Function to handle UI changes based on auth state
+function updateUI(user) {
+    const signInBtn = document.getElementById('sign-in-btn');
+    const signOutBtn = document.getElementById('sign-out-btn');
+    
+    if (user) {
+        signInBtn.style.display = 'none';
+        signOutBtn.style.display = 'inline-block';
+        // Optional: display user name
+        // document.getElementById('header-title').innerText = `Yashvi Homeboard - Welcome, ${user.email.split('@')[0]}`;
+    } else {
+        signInBtn.style.display = 'inline-block';
+        signOutBtn.style.display = 'none';
+        // document.getElementById('header-title').innerText = 'Yashvi Homeboard';
+    }
 }
 
 async function renderGrid(startDate) {
@@ -103,7 +149,7 @@ async function renderGrid(startDate) {
             const td = document.createElement('td');
             td.classList.add('cell');
             td.dataset.date = dateStr;
-            td.innerHTML = `<div class="date-label">${cellDate.getDate()}</div><div class="content"></div>`; // Removed "Enter notes..."
+            td.innerHTML = `<div class="date-label">${cellDate.getDate()}</div><div class="content"></div>`;
             tr.appendChild(td);
         }
         tbody.appendChild(tr);
