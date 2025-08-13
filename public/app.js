@@ -1,7 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-
-// 🔹 Replace with your own Supabase project credentials
+// Supabase initialization
 const SUPABASE_URL = 'https://kspgpdjkcwgctvkglgpr.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzcGdwZGprY3dnY3R2a2dsZ3ByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5MTgxMTUsImV4cCI6MjA3MDQ5NDExNX0.TdAPwulNmAcgMdBFDLbL1LTyKLOVTAN2YVn1pksORtk';
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -13,7 +12,6 @@ const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const monthLabel = document.getElementById('monthLabel');
 const specialNoteCard = document.getElementById('specialNoteCard');
-const specialNotePreview = document.getElementById('specialNotePreview');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalDate = document.getElementById('modalDate');
 const modalDay = document.getElementById('modalDay');
@@ -24,22 +22,24 @@ const deleteBtn = document.getElementById('deleteBtn');
 const saveBtn = document.getElementById('saveBtn');
 const toast = document.getElementById('toast');
 
+// State
 let currentDate = new Date();
 let selectedDate = null;
 let notesData = {};
 
-// Render weekdays header
-function renderWeekdays() {
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  weekdayRow.innerHTML = weekdays.map(day => `<div class="weekday">${day}</div>`).join('');
-}
-
-// Render 2-week grid
+// Grid rendering
 function renderGrid() {
   grid.innerHTML = '';
   const start = new Date(currentDate);
   start.setDate(start.getDate() - start.getDay());
 
+  monthLabel.textContent = start.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+  // Render weekday headers
+  weekdayRow.innerHTML = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    .map(day => `<div>${day}</div>`).join('');
+
+  // Render grid cells
   for (let i = 0; i < 14; i++) {
     const date = new Date(start);
     date.setDate(start.getDate() + i);
@@ -48,26 +48,25 @@ function renderGrid() {
 
     const cell = document.createElement('div');
     cell.className = 'cell';
-    cell.tabIndex = 0; // Make cell focusable
-    
+    if (date.toDateString() === new Date().toDateString()) {
+      cell.classList.add('today');
+    }
+
     cell.innerHTML = `
       <div class="cell-head">
         <span class="date">${date.getDate()}</span>
         <span class="weekday">${date.toLocaleString('default', { weekday: 'short' })}</span>
+        ${note.tag !== 'none' ? `<span class="tag tag-${note.tag}">${note.tag}</span>` : ''}
       </div>
       <div class="preview">${note.text || 'Click to add note...'}</div>
     `;
 
-    // Make cell clickable to open modal
     cell.addEventListener('click', () => openModal(date));
-    cell.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') openModal(date);
-    });
-
     grid.appendChild(cell);
   }
 }
 
+// Modal functions
 function openModal(date) {
   selectedDate = date;
   const dateStr = date.toISOString().split('T')[0];
@@ -76,33 +75,48 @@ function openModal(date) {
   modalDate.textContent = date.toLocaleDateString();
   modalDay.textContent = date.toLocaleString('default', { weekday: 'long' });
   noteInput.value = note.text;
+  tagSelect.value = note.tag;
+  deleteBtn.hidden = !note.text;
   modalOverlay.hidden = false;
-  noteInput.focus(); // Focus the textarea when modal opens
+  noteInput.focus();
 }
 
+function closeModalFunc() {
+  modalOverlay.hidden = true;
+  selectedDate = null;
+}
+
+// Note operations
 async function saveNote() {
   if (!selectedDate) return;
   
   const dateStr = selectedDate.toISOString().split('T')[0];
   const text = noteInput.value.trim();
+  const tag = tagSelect.value;
   
-  notesData[dateStr] = { text, tag: 'none' };
+  notesData[dateStr] = { text, tag };
   
   await supabase
     .from('notes')
-    .upsert([{ date: dateStr, text, tag: 'none' }]);
+    .upsert([{ date: dateStr, text, tag }]);
   
-  showToast('Saved');
+  showToast('Note saved');
   closeModalFunc();
-  renderGrid(); // Refresh grid to show updated note
+  renderGrid();
 }
 
 async function deleteNote() {
   if (!selectedDate) return;
+  
   const dateStr = selectedDate.toISOString().split('T')[0];
   delete notesData[dateStr];
-  await supabase.from('notes').delete().eq('date', dateStr);
-  showToast('Deleted');
+  
+  await supabase
+    .from('notes')
+    .delete()
+    .eq('date', dateStr);
+  
+  showToast('Note deleted');
   closeModalFunc();
   renderGrid();
 }
@@ -111,12 +125,16 @@ async function deleteNote() {
 specialNoteCard.addEventListener('click', async () => {
   const note = prompt('Enter special note:', specialNotePreview.textContent);
   if (note !== null) {
-    specialNotePreview.textContent = note || 'Click to add special notes…';
-    await supabase.from('special_notes').upsert([{ id: 1, text: note }]);
+    await supabase
+      .from('special_notes')
+      .upsert([{ id: 1, text: note }]);
+    
+    specialNotePreview.textContent = note;
+    showToast('Special note updated');
   }
 });
 
-// Toast
+// Toast notification
 function showToast(msg) {
   toast.textContent = msg;
   toast.hidden = false;
@@ -128,36 +146,44 @@ prevBtn.addEventListener('click', () => {
   currentDate.setDate(currentDate.getDate() - 14);
   renderGrid();
 });
+
 nextBtn.addEventListener('click', () => {
   currentDate.setDate(currentDate.getDate() + 14);
   renderGrid();
 });
 
-// Modal buttons
+// Modal event listeners
 closeModal.addEventListener('click', closeModalFunc);
 saveBtn.addEventListener('click', saveNote);
 deleteBtn.addEventListener('click', deleteNote);
 
-// Load data
+// Data loading
 async function loadNotes() {
   const { data } = await supabase.from('notes').select('*');
   notesData = {};
   data?.forEach(note => {
-    notesData[note.date] = { text: note.text, tag: note.tag };
+    notesData[note.date] = {
+      text: note.text,
+      tag: note.tag
+    };
   });
 
-  const { data: special } = await supabase.from('special_notes').select('*').eq('id', 1).single();
-  if (special?.text) {
+  const { data: special } = await supabase
+    .from('special_notes')
+    .select('*')
+    .eq('id', 1)
+    .single();
+  
+  if (special) {
     specialNotePreview.textContent = special.text;
   }
+}
 
-  renderWeekdays();
+// Initialize app
+async function init() {
+  modalOverlay.hidden = true;
+  await loadNotes();
   renderGrid();
 }
 
-// Init
-loadNotes();
-modalOverlay.hidden = true;
-document.addEventListener('DOMContentLoaded', () => {
-  modalOverlay.hidden = true;
-});
+init();

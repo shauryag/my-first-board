@@ -1,59 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Yashvi Homeboard</title>
-  <link rel="stylesheet" href="style.css"/>
+    // ...existing code...
 </head>
 <body>
-  <header class="app-header">
-    <h1>📚 Yashvi Homeboard</h1>
-    <div class="nav">
-      <button id="prevBtn" class="btn">Prev</button>
-      <div id="monthLabel" class="month-label"></div>
-      <button id="nextBtn" class="btn">Next</button>
+    <header class="app-header">
+        <h1>📚 Yashvi Homeboard</h1>
+        <div class="nav">
+            <button id="prevBtn" class="btn">Prev</button>
+            <div id="monthLabel" class="month-label"></div>
+            <button id="nextBtn" class="btn">Next</button>
+        </div>
+    </header>
+
+    <!-- Weekday headings -->
+    <div class="weekdays" id="weekdayRow"></div>
+
+    <!-- Two Weeks Grid (2 rows x 7 cols) -->
+    <div id="grid" class="grid"></div>
+
+    <!-- Special Notes -->
+    <section class="special">
+        <h2>⭐ Special Notes</h2>
+        <div id="specialNoteCard" class="special-card" role="button" tabindex="0">
+            <div id="specialNotePreview"></div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div id="modalOverlay" class="modal-overlay" hidden>
+        <div class="modal">
+            <div class="modal-head">
+                <div>
+                    <div id="modalDate" class="modal-date"></div>
+                    <div id="modalDay" class="modal-day"></div>
+                </div>
+                <button id="closeModal" class="btn btn-light">Close</button>
+            </div>
+
+            <label class="lbl">Note</label>
+            <textarea id="noteInput" rows="8" class="input" placeholder="Enter your note here..."></textarea>
+
+            <label class="lbl">Tag</label>
+            <select id="tagSelect" class="input">
+                <option value="none">None</option>
+                <option value="important">Important</option>
+                <option value="todo">Todo</option>
+                <option value="done">Done</option>
+            </select>
+
+            <div class="modal-actions">
+                <button id="deleteBtn" class="btn btn-danger">Delete</button>
+                <button id="saveBtn" class="btn btn-primary">Save</button>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <!-- Weekday headings -->
-  <div class="weekdays" id="weekdayRow"></div>
+    <!-- Toast -->
+    <div id="toast" class="toast" hidden></div>
 
-  <!-- Two Weeks Grid (2 rows x 7 cols) -->
-  <div id="grid" class="grid"></div>
-
-  <!-- Special Notes -->
-  <section class="special">
-    <h2>⭐ Special Notes</h2>
-    <div id="specialNoteCard" class="special-card" role="button" tabindex="0" aria-label="Open special notes">
-      <div id="specialNotePreview" class="special-preview">Click to add special notes…</div>
-    </div>
-  </section>
-
-  <!-- Modal -->
-  <div id="modalOverlay" class="modal-overlay" hidden>
-  <div class="modal">
-    <div class="modal-head">
-      <div>
-        <div id="modalDate" class="modal-date"></div>
-        <div id="modalDay" class="modal-day"></div>
-      </div>
-      <button id="closeModal" class="btn btn-light">Close</button>
-    </div>
-
-    <label class="lbl">Note</label>
-    <textarea id="noteInput" rows="8" class="input" placeholder="Enter your note here..."></textarea>
-
-    <div class="modal-actions">
-      <button id="deleteBtn" class="btn btn-danger">Delete</button>
-      <button id="saveBtn" class="btn btn-primary">Save</button>
-    </div>
-  </div>
-</div>
-  <!-- Minimal toast -->
-  <div id="toast" class="toast" hidden></div>
-
-  <!-- App -->
-  <script type="module" src="app.js"></script>
+    <!-- App -->
+    <script type="module" src="app.js"></script>
 </body>
 </html>
