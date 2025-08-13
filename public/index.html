@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yashvi Homeboard</title>
     <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
     <div id="header">
@@ -18,26 +17,24 @@
     </div>
     <div id="grid-container"></div>
     <div id="notes-section" class="notes" data-date="notes">
-        <h3>Special Notes for Future Work</h3>
-        <div id="notes-content"></div>
+        <h3>Special Notes</h3>
+        <div id="notes-content">Enter notes...</div>
     </div>
 
     <!-- Modal for editing -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <h2>Edit Entry</h2>
-            <label for="content">Content:</label>
-            <textarea id="content" rows="5"></textarea>
-            <label for="type" id="type-label">Type:</label>
+            <label for="content">Notes:</label>
+            <textarea id="content" rows="5">Enter notes...</textarea>
+            <label for="type">Type:</label>
             <select id="type">
-                <option value="">None</option>
+                <option value="">General (White)</option>
                 <option value="exam">Exam (Red)</option>
                 <option value="test">Test (Yellow)</option>
-                <option value="homework">Homework (Green)</option>
             </select>
             <div class="buttons">
-                <button id="save">Save</button>
-                <button id="delete">Delete</button>
+                <button id="save">Save/Close</button>
                 <button id="cancel">Cancel</button>
             </div>
         </div>
