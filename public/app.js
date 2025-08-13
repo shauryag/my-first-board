@@ -10,7 +10,7 @@ let currentStartDate;
 async function init() {
     let today = new Date();
     const day = today.getDay();
-    const diff = today.getDate() - day + (day === 0 ? -6 : 1); // Start of the week (Monday)
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     currentStartDate = new Date(today.setDate(diff));
 
     await renderGrid(currentStartDate);
@@ -35,7 +35,6 @@ async function init() {
     document.getElementById('cancel').addEventListener('click', () => modal.style.display = 'none');
     document.getElementById('save').addEventListener('click', saveEntry);
 
-    // Event delegation for dynamic cells and notes section
     document.addEventListener('click', async (e) => {
         const cell = e.target.closest('.cell');
         const notes = e.target.closest('.notes');
@@ -89,7 +88,6 @@ async function renderGrid(startDate) {
         const tr = document.createElement('tr');
         const weekLabel = document.createElement('th');
         
-        // Correctly calculate the end date of the week for the label
         const weekEnd = new Date(weekStart);
         weekEnd.setDate(weekEnd.getDate() + 6);
         
@@ -105,7 +103,7 @@ async function renderGrid(startDate) {
             const td = document.createElement('td');
             td.classList.add('cell');
             td.dataset.date = dateStr;
-            td.innerHTML = `<div class="date-label">${cellDate.getDate()}</div><div class="content">Enter notes...</div>`;
+            td.innerHTML = `<div class="date-label">${cellDate.getDate()}</div><div class="content"></div>`; // Removed "Enter notes..."
             tr.appendChild(td);
         }
         tbody.appendChild(tr);
@@ -113,14 +111,13 @@ async function renderGrid(startDate) {
     table.appendChild(tbody);
     gridContainer.appendChild(table);
     
-    // Load data from Supabase after grid is rendered
     const { data, error } = await supabase.from('homeboard_entries').select('*').in('date', dates);
     if (error) console.error(error);
     if (data) {
         data.forEach(entry => {
             const cell = document.querySelector(`.cell[data-date="${entry.date}"]`);
             if (cell) {
-                cell.querySelector('.content').innerText = entry.content || 'Enter notes...';
+                cell.querySelector('.content').innerText = entry.content || '';
                 cell.dataset.type = entry.type || '';
                 cell.classList.remove('red', 'yellow');
                 if (entry.type === 'exam') cell.classList.add('red');
@@ -144,13 +141,13 @@ async function loadNotes() {
 async function saveEntry() {
     const modal = document.getElementById('modal');
     const date = modal.dataset.date;
-    const content = document.getElementById('content').value || 'Enter notes...';
+    const content = document.getElementById('content').value || '';
     const type = document.getElementById('type').value;
 
     if (date === 'notes') {
-        const { error } = await supabase.from('special_notes').upsert({ id: 1, content }, { onConflict: 'id' });
+        const { error } = await supabase.from('special_notes').upsert({ id: 1, content: content || 'Enter notes...' }, { onConflict: 'id' });
         if (error) console.error(error);
-        document.getElementById('notes-content').innerText = content;
+        document.getElementById('notes-content').innerText = content || 'Enter notes...';
     } else {
         const { error } = await supabase.from('homeboard_entries').upsert({ date, content, type }, { onConflict: 'date' });
         if (error) console.error(error);
