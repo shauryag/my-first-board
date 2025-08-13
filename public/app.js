@@ -199,7 +199,6 @@ async function saveEntry() {
     const content = document.getElementById('content').value || '';
     let type = document.getElementById('type').value;
 
-    // Fix for deleting content: if content is empty, reset type to clear color
     if (content === '') {
         type = '';
     }
