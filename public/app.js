@@ -74,7 +74,7 @@ function openModal(date) {
   const dateStr = date.toISOString().split('T')[0];
   const note = notesData[dateStr] || { text: '', tag: 'none' };
 
-  modalDate.textContent = date.toLocaleDateString();
+  modalDate.textContent = dateStr;
   modalDay.textContent = date.toLocaleString('default', { weekday: 'long' });
   noteInput.value = note.text;
   tagSelect.value = note.tag;
@@ -165,3 +165,4 @@ async function loadNotes() {
 
 // Init
 loadNotes();
+modalOverlay.hidden = true;
