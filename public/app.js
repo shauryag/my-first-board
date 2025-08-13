@@ -32,6 +32,7 @@ async function init() {
 
     await renderGrid(currentStartDate);
     await loadNotes();
+    await renderReminders(); // NEW: Call the reminder function on init
 
     document.getElementById('prev').addEventListener('click', () => {
         currentStartDate.setDate(currentStartDate.getDate() - 14);
@@ -101,7 +102,7 @@ function updateUI(user) {
     
     if (user) {
         signInBtn.style.display = 'none';
-        userInfoDiv.style.display = 'flex'; // Show the user info container
+        userInfoDiv.style.display = 'flex';
 
         const profilePicture = user.user_metadata.avatar_url;
         const userName = user.user_metadata.full_name;
@@ -111,7 +112,7 @@ function updateUI(user) {
 
     } else {
         signInBtn.style.display = 'inline-block';
-        userInfoDiv.style.display = 'none'; // Hide the user info container
+        userInfoDiv.style.display = 'none';
     }
 }
 
@@ -211,6 +212,41 @@ async function saveEntry() {
         }
     }
     modal.style.display = 'none';
+    await renderReminders(); // NEW: Call the reminder function after saving
+}
+
+// NEW FUNCTION TO RENDER REMINDERS
+async function renderReminders() {
+    const { data, error } = await supabase
+        .from('homeboard_entries')
+        .select('date, content, type')
+        .or('type.eq.exam,type.eq.test') // Filter for exams or tests
+        .order('date', { ascending: true }); // Order by date
+
+    if (error) {
+        console.error('Error fetching reminders:', error);
+        return;
+    }
+
+    const remindersList = document.getElementById('reminders-list');
+    remindersList.innerHTML = ''; // Clear previous list
+
+    if (data && data.length > 0) {
+        data.forEach(entry => {
+            const li = document.createElement('li');
+            const dateObj = new Date(entry.date);
+            const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            li.innerHTML = `
+                <span class="reminder-type-${entry.type}">(${entry.type.toUpperCase()})</span>
+                <span class="reminder-date">${formattedDate}:</span>
+                <span>${entry.content}</span>
+            `;
+            remindersList.appendChild(li);
+        });
+    } else {
+        remindersList.innerHTML = '<li>No upcoming exams or tests!</li>';
+    }
 }
 
 init();

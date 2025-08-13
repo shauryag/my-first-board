@@ -1,9 +1,9 @@
 :root {
-    --primary-color: #f7a7bb; /* A fun pink */
-    --secondary-color: #a7c8f7; /* A gentle blue */
-    --background-color: #fce4ec; /* A very light pink */
-    --text-color: #5d4037; /* A soft brown */
-    --border-color: #f06292; /* A darker pink */
+    --primary-color: #f7a7bb;
+    --secondary-color: #a7c8f7;
+    --background-color: #fce4ec;
+    --text-color: #5d4037;
+    --border-color: #f06292;
 }
 
 body {
@@ -39,7 +39,7 @@ h1 {
     background-color: var(--secondary-color);
     color: white;
     border: none;
-    border-radius: 20px; /* Makes buttons round! */
+    border-radius: 20px;
     padding: 10px 15px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     cursor: pointer;
@@ -70,7 +70,7 @@ th, td {
     width: 14.28%;
     height: 80px;
     cursor: pointer;
-    border-radius: 15px; /* Round the grid cells */
+    border-radius: 15px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     background-color: white;
 }
@@ -89,7 +89,7 @@ th {
     position: absolute;
     top: 5px;
     right: 5px;
-    font-size: 14px; /* A bit bigger font */
+    font-size: 14px;
     color: var(--text-color);
 }
 
@@ -170,4 +170,47 @@ th {
 
 .buttons button {
     margin-left: 10px;
+}
+
+/* NEW STYLES FOR REMINDERS */
+#reminders-section {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 15px;
+    border: 2px dashed var(--primary-color);
+}
+
+#reminders-section h3 {
+    text-align: center;
+    color: var(--primary-color);
+}
+
+#reminders-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#reminders-list li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+#reminders-list li:last-child {
+    border-bottom: none;
+}
+
+.reminder-date {
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+.reminder-type-exam {
+    font-weight: bold;
+    color: #8b0000; /* Dark red for exams */
+}
+
+.reminder-type-test {
+    font-weight: bold;
+    color: #a58e0a; /* Dark yellow for tests */
 }
