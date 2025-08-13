@@ -13,8 +13,15 @@
             <button id="prev">Previous 2 Weeks</button>
             <input type="date" id="startDate">
             <button id="next">Next 2 Weeks</button>
-            <button id="sign-in-btn">Sign in with Google</button>
-            <button id="sign-out-btn" style="display: none;">Sign Out</button>
+            
+            <div id="auth-container">
+                <button id="sign-in-btn">Sign in with Google</button>
+                <div id="user-info" style="display: none;">
+                    <span id="user-name"></span>
+                    <img id="user-avatar" src="" alt="User Avatar">
+                    <button id="sign-out-btn">Sign Out</button>
+                </div>
+            </div>
         </div>
     </div>
     <div id="grid-container"></div>

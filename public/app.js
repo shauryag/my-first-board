@@ -81,7 +81,6 @@ async function init() {
         }
     });
     
-    // Add event listeners for the new buttons
     document.getElementById('sign-in-btn').addEventListener('click', () => {
         supabase.auth.signInWithOAuth({
             provider: 'google',
@@ -94,20 +93,25 @@ async function init() {
     });
 }
 
-// Function to handle UI changes based on auth state
 function updateUI(user) {
     const signInBtn = document.getElementById('sign-in-btn');
-    const signOutBtn = document.getElementById('sign-out-btn');
+    const userInfoDiv = document.getElementById('user-info');
+    const userAvatar = document.getElementById('user-avatar');
+    const userNameSpan = document.getElementById('user-name');
     
     if (user) {
         signInBtn.style.display = 'none';
-        signOutBtn.style.display = 'inline-block';
-        // Optional: display user name
-        // document.getElementById('header-title').innerText = `Yashvi Homeboard - Welcome, ${user.email.split('@')[0]}`;
+        userInfoDiv.style.display = 'flex'; // Show the user info container
+
+        const profilePicture = user.user_metadata.avatar_url;
+        const userName = user.user_metadata.full_name;
+
+        userAvatar.src = profilePicture;
+        userNameSpan.innerText = userName;
+
     } else {
         signInBtn.style.display = 'inline-block';
-        signOutBtn.style.display = 'none';
-        // document.getElementById('header-title').innerText = 'Yashvi Homeboard';
+        userInfoDiv.style.display = 'none'; // Hide the user info container
     }
 }
 

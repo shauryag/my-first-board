@@ -23,6 +23,29 @@ body {
     margin: 0 5px;
 }
 
+/* New CSS for user info display */
+#auth-container {
+    display: flex;
+    align-items: center;
+}
+
+#user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+}
+
+#user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+#user-name {
+    font-weight: bold;
+}
+
 #grid-container {
     margin: 20px 0;
     overflow-x: auto;
