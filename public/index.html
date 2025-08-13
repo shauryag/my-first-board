@@ -16,37 +16,35 @@
         </div>
     </header>
 
-    <div class="grid-container">
-        <div id="weekdayRow" class="weekday-row"></div>
-        <div id="grid" class="grid"></div>
-    </div>
+    <main class="container">
+        <div class="grid-wrapper">
+            <div id="weekdayHeader" class="weekday-header"></div>
+            <div id="grid" class="grid"></div>
+        </div>
 
-    <section class="special-notes">
-        <h2>⭐ Special Notes</h2>
-        <div id="specialNote" class="special-grid"></div>
-    </section>
+        <section class="special-notes">
+            <h2>⭐ Special Notes</h2>
+            <div id="specialNote" class="special-grid"></div>
+        </section>
+    </main>
 
-    <!-- Edit Modal -->
-    <div id="editModal" class="modal" hidden>
-        <div class="modal-content">
+    <div id="modalOverlay" class="modal-overlay" hidden>
+        <div class="modal">
             <div class="modal-header">
-                <h3 id="modalTitle"></h3>
+                <h3 id="modalDate"></h3>
                 <button id="closeModal" class="btn-close">×</button>
             </div>
-            <div class="modal-body">
-                <textarea id="noteText" placeholder="Enter your note..."></textarea>
-                <div class="color-picker">
-                    <label>Type:</label>
-                    <select id="noteType">
-                        <option value="homework">Homework</option>
-                        <option value="test">Test</option>
-                        <option value="exam">Exam</option>
-                    </select>
+            <div class="modal-content">
+                <textarea id="noteInput" rows="4" placeholder="Enter note..."></textarea>
+                <select id="typeSelect" class="type-select">
+                    <option value="homework">Homework</option>
+                    <option value="test">Test</option>
+                    <option value="exam">Exam</option>
+                </select>
+                <div class="modal-actions">
+                    <button id="deleteBtn" class="btn btn-danger">Delete</button>
+                    <button id="saveBtn" class="btn btn-primary">Save</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button id="deleteNote" class="btn btn-danger">Delete</button>
-                <button id="saveNote" class="btn btn-primary">Save</button>
             </div>
         </div>
     </div>
