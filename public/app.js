@@ -246,7 +246,7 @@ async function renderReminders() {
         tomorrow.setDate(tomorrow.getDate() + 1);
 
         data.forEach(entry => {
-            const entryDate = new Date(entry.date);
+            const entryDate = new Date(entry.date + 'T12:00:00'); // Fixes the time zone bug
             const isReminderDue = entry.reminder_set && entryDate.toDateString() === tomorrow.toDateString();
 
             const li = document.createElement('li');
