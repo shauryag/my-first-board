@@ -21,20 +21,27 @@ body {
 
 #grid-container {
     margin: 20px 0;
+    overflow-x: auto; /* Enable horizontal scrolling for 14 grids */
+    white-space: nowrap;
+}
+
+.grid-week {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 20px;
 }
 
 table {
     border-collapse: collapse;
-    width: 100%;
-    table-layout: fixed;
+    border: 1px solid #ccc;
 }
 
 th, td {
     border: 1px solid #ccc;
     padding: 10px;
     text-align: center;
-    width: 14.28%; /* 100% / 7 days */
-    vertical-align: top;
+    width: 150px; /* Fixed width for 2x2 cells */
+    height: 100px;
 }
 
 th {
@@ -43,7 +50,6 @@ th {
 
 .cell {
     cursor: pointer;
-    height: 100px;
     position: relative;
 }
 
