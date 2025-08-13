@@ -84,6 +84,7 @@ function openModal(date) {
 
 function closeModalFunc() {
   modalOverlay.hidden = true;
+  selectedDate = null;
 }
 
 async function saveNote() {
@@ -166,3 +167,6 @@ async function loadNotes() {
 // Init
 loadNotes();
 modalOverlay.hidden = true;
+document.addEventListener('DOMContentLoaded', () => {
+  modalOverlay.hidden = true;
+});
