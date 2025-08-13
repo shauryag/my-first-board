@@ -38,72 +38,63 @@ function renderWeekdays() {
 function renderGrid() {
   grid.innerHTML = '';
   const start = new Date(currentDate);
-  start.setDate(start.getDate() - start.getDay()); // Start from Sunday
-
-  monthLabel.textContent = start.toLocaleString('default', { month: 'long', year: 'numeric' });
+  start.setDate(start.getDate() - start.getDay());
 
   for (let i = 0; i < 14; i++) {
     const date = new Date(start);
     date.setDate(start.getDate() + i);
-
     const dateStr = date.toISOString().split('T')[0];
     const note = notesData[dateStr] || { text: '', tag: 'none' };
 
     const cell = document.createElement('div');
     cell.className = 'cell';
-    if (date.toDateString() === new Date().toDateString()) {
-      cell.classList.add('today');
-    }
-
+    cell.tabIndex = 0; // Make cell focusable
+    
     cell.innerHTML = `
       <div class="cell-head">
         <span class="date">${date.getDate()}</span>
         <span class="weekday">${date.toLocaleString('default', { weekday: 'short' })}</span>
-        ${note.tag !== 'none' ? `<span class="tag tag-${note.tag}">${note.tag}</span>` : ''}
       </div>
-      <div class="preview">${note.text ? note.text : ''}</div>
+      <div class="preview">${note.text || 'Click to add note...'}</div>
     `;
 
+    // Make cell clickable to open modal
     cell.addEventListener('click', () => openModal(date));
+    cell.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') openModal(date);
+    });
+
     grid.appendChild(cell);
   }
 }
-// Modal logic
+
 function openModal(date) {
   selectedDate = date;
   const dateStr = date.toISOString().split('T')[0];
   const note = notesData[dateStr] || { text: '', tag: 'none' };
 
-  modalDate.textContent = dateStr;
+  modalDate.textContent = date.toLocaleDateString();
   modalDay.textContent = date.toLocaleString('default', { weekday: 'long' });
   noteInput.value = note.text;
-  tagSelect.value = note.tag;
-  deleteBtn.hidden = !note.text;
   modalOverlay.hidden = false;
-}
-
-function closeModalFunc() {
-  modalOverlay.hidden = true;
-  selectedDate = null;
+  noteInput.focus(); // Focus the textarea when modal opens
 }
 
 async function saveNote() {
   if (!selectedDate) return;
+  
   const dateStr = selectedDate.toISOString().split('T')[0];
   const text = noteInput.value.trim();
-  const tag = tagSelect.value;
-
-  if (text) {
-    notesData[dateStr] = { text, tag };
-    await supabase.from('notes').upsert([{ date: dateStr, text, tag }]);
-  } else {
-    delete notesData[dateStr];
-    await supabase.from('notes').delete().eq('date', dateStr);
-  }
-
+  
+  notesData[dateStr] = { text, tag: 'none' };
+  
+  await supabase
+    .from('notes')
+    .upsert([{ date: dateStr, text, tag: 'none' }]);
+  
   showToast('Saved');
   closeModalFunc();
-  renderGrid();
+  renderGrid(); // Refresh grid to show updated note
 }
 
 async function deleteNote() {

@@ -32,36 +32,24 @@
 
   <!-- Modal -->
   <div id="modalOverlay" class="modal-overlay" hidden>
-    <div class="modal">
-      <div class="modal-head">
-        <div>
-          <div id="modalDate" class="modal-date"></div>
-          <div id="modalDay" class="modal-day"></div>
-        </div>
-        <button id="closeModal" class="btn btn-light">Close</button>
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div id="modalDate" class="modal-date"></div>
+        <div id="modalDay" class="modal-day"></div>
       </div>
+      <button id="closeModal" class="btn btn-light">Close</button>
+    </div>
 
-      <label class="lbl">Note</label>
-      <textarea id="noteInput" rows="8" class="input"></textarea>
+    <label class="lbl">Note</label>
+    <textarea id="noteInput" rows="8" class="input" placeholder="Enter your note here..."></textarea>
 
-      <div class="row">
-        <label class="lbl">Tag</label>
-        <select id="tagSelect" class="input">
-          <option value="none">None</option>
-          <option value="homework">Homework</option>
-          <option value="test">Test</option>
-          <option val ue="exam">Exam</option>
-        </select>
-        <span class="hint">Soft background for quick priority</span>
-      </div>
-
-      <div class="modal-actions">
-        <button id="deleteBtn" class="btn btn-danger" hidden>Delete</button>
-        <button id="saveBtn" class="btn btn-primary">Save</button>
-      </div>
+    <div class="modal-actions">
+      <button id="deleteBtn" class="btn btn-danger">Delete</button>
+      <button id="saveBtn" class="btn btn-primary">Save</button>
     </div>
   </div>
-
+</div>
   <!-- Minimal toast -->
   <div id="toast" class="toast" hidden></div>
 
