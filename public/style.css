@@ -249,3 +249,23 @@ th {
 #reminder-label input[type="checkbox"] {
     margin-right: 10px;
 }
+
+/* STYLES FOR THE FAMILY MODAL */
+.family-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+#join-family-form, #family-id-display {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#family-id-output {
+    background-color: #eee;
+    border: 1px solid #ccc;
+    padding: 5px;
+    width: 80%;
+}
