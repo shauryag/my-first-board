@@ -1,99 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yashvi Homeboard</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Homeboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="header">
-        <h1><span class="teddy-icon">🧸</span> <span id="child-name-header"></span> Homeboard</h1>
-        <div id="nav">
-            <button id="prev">Previous 2 Weeks</button>
-            <input type="date" id="startDate">
-            <button id="next">Next 2 Weeks</button>
-            
-            <div id="auth-container">
-                <button id="sign-in-btn">Sign in with Google</button>
-                <div id="user-info" style="display: none;">
-                    <span id="user-name"></span>
-                    <img id="user-avatar" src="" alt="User Avatar">
-                    <button id="sign-out-btn">Sign Out</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="grid-container"></div>
-    <div id="notes-section" class="notes" data-date="notes">
-        <h3>Special Notes</h3>
-        <div id="notes-content">Enter notes...</div>
-    </div>
-    
-    <div id="reminders-section">
-        <h3>Upcoming Exams & Tests</h3>
-        <ul id="reminders-list"></ul>
-    </div>
+  <div id="header">
+    <h1><span class="teddy-icon">🧸</span> <span id="child-name-header"></span> Homeboard</h1>
+    <div id="nav">
+      <button id="prev">Previous 2 Weeks</button>
+      <input type="date" id="startDate">
+      <button id="next">Next 2 Weeks</button>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <h2>Edit Entry</h2>
-            <label for="content">Notes:</label>
-            <textarea id="content" rows="5"></textarea>
-            <label for="type">Type:</label>
-            <select id="type">
-                <option value="">General (White)</option>
-                <option value="exam">Exam (Red)</option>
-                <option value="test">Test (Yellow)</option>
-            </select>
-            <label for="set-reminder" id="reminder-label">
-                <input type="checkbox" id="set-reminder"> Set reminder for 1 day prior
-            </label>
-            <div class="buttons">
-                <button id="save">Save/Close</button>
-                <button id="cancel">Cancel</button>
-            </div>
+      <div id="auth-container">
+        <button id="sign-in-btn">Sign in with Google</button>
+        <div id="user-info" style="display:none;">
+          <span id="user-name"></span>
+          <img id="user-avatar" src="" alt="User Avatar"/>
+          <button id="sign-out-btn">Sign Out</button>
         </div>
+      </div>
     </div>
-    
-    <div id="name-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <h2>Enter Child's Name</h2>
-            <p>What is your child's name? It will appear on the homeboard.</p>
-            <input type="text" id="child-name-input">
-            <div class="buttons">
-                <button id="save-name-btn">Save</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="family-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <h2>Welcome!</h2>
-            <p>It looks like you're new. You can either create a new family or join an existing one.</p>
-            <div class="family-options">
-                <button id="create-family-btn">Create New Family</button>
-                <button id="join-family-btn">Join Existing Family</button>
-            </div>
-            <div id="join-family-form" style="display: none;">
-                <p>Enter the Family ID to join:</p>
-                <input type="text" id="family-id-input" placeholder="Paste Family ID here">
-                <div class="buttons">
-                    <button id="submit-join-btn">Join</button>
-                    <button id="cancel-join-btn">Cancel</button>
-                </div>
-            </div>
-            <div id="family-id-display" style="display: none;">
-                <p>Your Family ID is:</p>
-                <input type="text" id="family-id-output" readonly>
-                <div class="buttons">
-                    <button id="copy-family-id-btn">Copy to Clipboard</button>
-                </div>
-            </div>
-        </div>
-    </div>
+  </div>
 
-    <script type="module" src="app.js"></script>
-</body>
-</html>
+  <div id="grid-container"></div>
+
+  <div id="notes-section" class="notes" data-date="notes">
+    <h3>Special Notes</h3>
+    <div id="notes-content">Enter notes...</div>
+  </div>
+
+  <div id="reminders-section">
+    <h3>Upcoming Exams & Tests</h3>
+    <ul id="reminders-list"></ul>
+  </div>
+
+  <!-- Edit modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h2>Edit Entry</h2>
+      <label for="content">Notes:</label>
+      <textarea id="content" rows="5"></textarea>
+
+      <label for="type">Type:</label>
+      <select id="type">
+        <option value="">General (White)</option>
+        <option value="exam">Exam (Red)</option>
+        <option value="test">Test (Yellow)</option>
+      </select>
+
+      <label for="set-reminder" id="reminder-label">
+        <input type="checkbox" id="set-reminder"> Set reminder for 1 day prior
+      </label>
+
+      <div class="buttons">
+        <button id="save">Save/Close</button>
+        <button id="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Child name modal -->
+  <div id="name-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Enter Child's Name</h2>
+      <p>What is your child's name? It will appear on the homeboard.</p>
+      <input type="text" id="child-name-input" />
+      <div class="buttons">
+        <button id="save-name-btn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Family modal -->
+  <div id="family-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Welcome!</h2>
+      <p>Create a new family or join an existing one to start saving entries.</p>
+
+      <div class="family-options">
+        <button id="create-family-btn">Create New Family</button>
+        <button id="join-family-btn">Join Exis
