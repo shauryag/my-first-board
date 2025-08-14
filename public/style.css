@@ -1,9 +1,9 @@
 :root {
-    --primary-color: #f7a7bb;
-    --secondary-color: #a7c8f7;
-    --background-color: #fce4ec;
-    --text-color: #5d4037;
-    --border-color: #f06292;
+    --primary-color: #f7a7bb; /* A fun pink */
+    --secondary-color: #a7c8f7; /* A gentle blue */
+    --background-color: #fce4ec; /* A very light pink */
+    --text-color: #5d4037; /* A soft brown */
+    --border-color: #f06292; /* A darker pink */
 }
 
 body {
@@ -39,7 +39,7 @@ h1 {
     background-color: var(--secondary-color);
     color: white;
     border: none;
-    border-radius: 20px;
+    border-radius: 20px; /* Makes buttons round! */
     padding: 10px 15px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     cursor: pointer;
@@ -49,6 +49,29 @@ h1 {
     border-radius: 10px;
     border: 2px solid var(--primary-color);
     padding: 5px;
+}
+
+/* New CSS for user info display */
+#auth-container {
+    display: flex;
+    align-items: center;
+}
+
+#user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+}
+
+#user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+}
+
+#user-name {
+    font-weight: bold;
 }
 
 #grid-container {
@@ -70,7 +93,7 @@ th, td {
     width: 14.28%;
     height: 80px;
     cursor: pointer;
-    border-radius: 15px;
+    border-radius: 15px; /* Round the grid cells */
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     background-color: white;
 }
@@ -172,7 +195,7 @@ th {
     margin-left: 10px;
 }
 
-/* NEW STYLES FOR REMINDERS */
+/* STYLES FOR REMINDERS */
 #reminders-section {
     margin-top: 20px;
     padding: 15px;
@@ -207,10 +230,22 @@ th {
 
 .reminder-type-exam {
     font-weight: bold;
-    color: #8b0000; /* Dark red for exams */
+    color: #8b0000;
 }
 
 .reminder-type-test {
     font-weight: bold;
-    color: #a58e0a; /* Dark yellow for tests */
+    color: #a58e0a;
+}
+
+/* STYLES FOR THE REMINDER CHECKBOX */
+#reminder-label {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+    color: var(--text-color);
+}
+
+#reminder-label input[type="checkbox"] {
+    margin-right: 10px;
 }

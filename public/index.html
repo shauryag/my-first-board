@@ -9,7 +9,7 @@
 </head>
 <body>
     <div id="header">
-        <h1><span class="teddy-icon">🧸</span> Yashvi Homeboard</h1>
+        <h1><span class="teddy-icon">🧸</span> <span id="child-name-header"></span> Homeboard</h1>
         <div id="nav">
             <button id="prev">Previous 2 Weeks</button>
             <input type="date" id="startDate">
@@ -53,6 +53,17 @@
             <div class="buttons">
                 <button id="save">Save/Close</button>
                 <button id="cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="name-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Enter Child's Name</h2>
+            <p>What is your child's name? It will appear on the homeboard.</p>
+            <input type="text" id="child-name-input">
+            <div class="buttons">
+                <button id="save-name-btn">Save</button>
             </div>
         </div>
     </div>

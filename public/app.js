@@ -25,6 +25,9 @@ async function init() {
         }
     });
 
+    // NEW: Check and set the child's name
+    setupChildName();
+
     let today = new Date();
     const day = today.getDay();
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
@@ -95,6 +98,9 @@ async function init() {
         const { error } = await supabase.auth.signOut();
         if (error) console.error(error);
     });
+
+    // NEW: Add event listener for the name modal save button
+    document.getElementById('save-name-btn').addEventListener('click', saveChildName);
 }
 
 function updateUI(user) {
@@ -118,6 +124,38 @@ function updateUI(user) {
         userInfoDiv.style.display = 'none';
     }
 }
+
+// NEW: Function to check and set the child's name
+function setupChildName() {
+    const name = localStorage.getItem('childName');
+    const nameHeader = document.getElementById('child-name-header');
+    const nameModal = document.getElementById('name-modal');
+
+    if (name) {
+        nameHeader.innerText = name;
+        nameModal.style.display = 'none';
+    } else {
+        nameHeader.innerText = 'Homeboard'; // Default text until a name is set
+        nameModal.style.display = 'block';
+    }
+}
+
+// NEW: Function to save the child's name
+function saveChildName() {
+    const nameInput = document.getElementById('child-name-input');
+    const nameHeader = document.getElementById('child-name-header');
+    const nameModal = document.getElementById('name-modal');
+    const name = nameInput.value.trim();
+
+    if (name) {
+        localStorage.setItem('childName', name);
+        nameHeader.innerText = name;
+        nameModal.style.display = 'none';
+    } else {
+        alert('Please enter a name!');
+    }
+}
+
 
 async function renderGrid(startDate) {
     document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
