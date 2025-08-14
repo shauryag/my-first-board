@@ -177,6 +177,7 @@ async function createFamily() {
         return;
     }
     currentFamilyId = newFamilyId;
+    document.getElementById('family-modal').style.display = 'none';
 
     document.getElementById('family-id-display').style.display = 'block';
     document.getElementById('family-id-output').value = newFamilyId;
@@ -243,6 +244,9 @@ function saveChildName() {
 }
 
 async function renderGrid(startDate) {
+    if (currentFamilyId === null) {
+        return;
+    }
     document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
 
     const gridContainer = document.getElementById('grid-container');
@@ -306,12 +310,15 @@ async function renderGrid(startDate) {
 }
 
 async function loadNotes() {
+    if (currentFamilyId === null) {
+        return;
+    }
     let { data, error } = await supabase.from('special_notes').select('*').eq('id', 1).eq('family_id', currentFamilyId);
     if (error) console.error(error);
     if (data && data.length > 0) {
         document.getElementById('notes-content').innerText = data[0].content || 'Enter notes...';
     } else {
-        await supabase.from('special_notes').upsert({ id: 1, content: 'Enter notes...' }, { onConflict: 'id' });
+        await supabase.from('special_notes').upsert({ id: 1, content: 'Enter notes...', family_id: currentFamilyId }, { onConflict: 'id' });
         document.getElementById('notes-content').innerText = 'Enter notes...';
     }
 }
