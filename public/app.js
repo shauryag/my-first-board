@@ -278,4 +278,114 @@ async function renderReminders() {
 }
 
 // The main entry point for the application is called at the bottom
+async function init() {
+    // Check for an active session on page load
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+        updateUI(session.user);
+        await setupFamily(session.user);
+    } else {
+        updateUI(null);
+    }
+
+    // This is the listener you're looking for
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session) {
+            updateUI(session.user);
+            await setupFamily(session.user);
+        } else {
+            updateUI(null);
+            currentFamilyId = null;
+            // Clear the homeboard and reminders
+            document.getElementById('grid-container').innerHTML = '';
+            document.getElementById('reminders-list').innerHTML = '';
+        }
+    });
+
+    // Check and set the child's name
+    setupChildName();
+
+    let today = new Date();
+    const day = today.getDay();
+    const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+    currentStartDate = new Date(today.setDate(diff));
+
+    // Await family setup before rendering the grid
+    if (currentFamilyId) {
+        await renderGrid(currentStartDate);
+        await loadNotes();
+        await renderReminders();
+    }
+
+    document.getElementById('prev').addEventListener('click', () => {
+        currentStartDate.setDate(currentStartDate.getDate() - 14);
+        renderGrid(currentStartDate);
+    });
+
+    document.getElementById('next').addEventListener('click', () => {
+        currentStartDate.setDate(currentStartDate.getDate() + 14);
+        renderGrid(currentStartDate);
+    });
+
+    document.getElementById('startDate').addEventListener('change', (e) => {
+        currentStartDate = new Date(e.target.value);
+        renderGrid(currentStartDate);
+    });
+
+    const modal = document.getElementById('modal');
+    document.getElementById('cancel').addEventListener('click', () => modal.style.display = 'none');
+    document.getElementById('save').addEventListener('click', saveEntry);
+
+    document.addEventListener('click', async (e) => {
+        const cell = e.target.closest('.cell');
+        const notes = e.target.closest('.notes');
+
+        if (cell || notes) {
+            const element = cell || notes;
+            const date = element.dataset.date;
+            
+            let content = '';
+            let type = '';
+
+            if (date === 'notes') {
+                content = document.getElementById('notes-content').innerText;
+                document.querySelector('.modal-content label[for="type"]').style.display = 'none';
+                document.getElementById('type').style.display = 'none';
+                document.getElementById('reminder-label').style.display = 'none';
+            } else {
+                content = element.querySelector('.content').innerText;
+                type = element.dataset.type || '';
+                document.querySelector('.modal-content label[for="type"]').style.display = 'block';
+                document.getElementById('type').style.display = 'block';
+                document.getElementById('reminder-label').style.display = 'flex';
+                document.getElementById('set-reminder').checked = element.dataset.reminder === 'true';
+            }
+
+            document.getElementById('content').value = (content === 'Enter notes...') ? '' : content;
+            document.getElementById('type').value = type;
+            modal.dataset.date = date;
+            modal.style.display = 'block';
+        }
+    });
+    
+    document.getElementById('sign-in-btn').addEventListener('click', () => {
+        supabase.auth.signInWithOAuth({
+            provider: 'google',
+        });
+    });
+
+    document.getElementById('sign-out-btn').addEventListener('click', async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) console.error(error);
+    });
+
+    // Add event listeners for the name modal save button
+    document.getElementById('save-name-btn').addEventListener('click', saveChildName);
+    
+    // Add event listeners for the family modal
+    document.getElementById('create-family-btn').addEventListener('click', createFamily);
+    document.getElementById('join-family-btn').addEventListener('click', renderJoinFamilyForm);
+    document.getElementById('submit-join-btn').addEventListener('click', joinFamily);
+    document.getElementById('cancel-join-btn').addEventListener('click', renderFamilyOptions);
+}
 init();
