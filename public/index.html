@@ -67,6 +67,32 @@
             </div>
         </div>
     </div>
+    
+    <div id="family-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Welcome!</h2>
+            <p>It looks like you're new. You can either create a new family or join an existing one.</p>
+            <div class="family-options">
+                <button id="create-family-btn">Create New Family</button>
+                <button id="join-family-btn">Join Existing Family</button>
+            </div>
+            <div id="join-family-form" style="display: none;">
+                <p>Enter the Family ID to join:</p>
+                <input type="text" id="family-id-input" placeholder="Paste Family ID here">
+                <div class="buttons">
+                    <button id="submit-join-btn">Join</button>
+                    <button id="cancel-join-btn">Cancel</button>
+                </div>
+            </div>
+            <div id="family-id-display" style="display: none;">
+                <p>Your Family ID is:</p>
+                <input type="text" id="family-id-output" readonly>
+                <div class="buttons">
+                    <button id="copy-family-id-btn">Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="app.js"></script>
 </body>

@@ -1,0 +1,24 @@
+{
+  "name": "yashvi-homeboard",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shauryag/my-first-board.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/shauryag/my-first-board/issues"
+  },
+  "homepage": "https://github.com/shauryag/my-first-board#readme",
+  "devDependencies": {
+    "live-server": "^1.2.0"
+  }
+}

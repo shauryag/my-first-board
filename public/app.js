@@ -6,22 +6,29 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentStartDate;
+let currentFamilyId = null; // NEW: Global variable to store the user's family ID
 
 async function init() {
     // Check for an active session on page load
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
         updateUI(session.user);
+        await setupFamily(session.user); // NEW: Call the family setup function
     } else {
         updateUI(null);
     }
 
     // Listen for auth state changes
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
         if (session) {
             updateUI(session.user);
+            await setupFamily(session.user); // NEW: Call the family setup function
         } else {
             updateUI(null);
+            currentFamilyId = null; // Clear family ID on sign out
+            // Clear the homeboard and reminders
+            document.getElementById('grid-container').innerHTML = '';
+            document.getElementById('reminders-list').innerHTML = '';
         }
     });
 
@@ -33,9 +40,12 @@ async function init() {
     const diff = today.getDate() - day + (day === 0 ? -6 : 1);
     currentStartDate = new Date(today.setDate(diff));
 
-    await renderGrid(currentStartDate);
-    await loadNotes();
-    await renderReminders();
+    // Await family setup before rendering the grid
+    if (currentFamilyId) {
+        await renderGrid(currentStartDate);
+        await loadNotes();
+        await renderReminders();
+    }
 
     document.getElementById('prev').addEventListener('click', () => {
         currentStartDate.setDate(currentStartDate.getDate() - 14);
@@ -99,33 +109,110 @@ async function init() {
         if (error) console.error(error);
     });
 
-    // NEW: Add event listener for the name modal save button
+    // NEW: Add event listeners for the name modal save button
     document.getElementById('save-name-btn').addEventListener('click', saveChildName);
+    
+    // NEW: Add event listeners for the family modal
+    document.getElementById('create-family-btn').addEventListener('click', createFamily);
+    document.getElementById('join-family-btn').addEventListener('click', renderJoinFamilyForm);
+    document.getElementById('submit-join-btn').addEventListener('click', joinFamily);
+    document.getElementById('cancel-join-btn').addEventListener('click', renderFamilyOptions);
 }
 
-function updateUI(user) {
-    const signInBtn = document.getElementById('sign-in-btn');
-    const userInfoDiv = document.getElementById('user-info');
-    const userAvatar = document.getElementById('user-avatar');
-    const userNameSpan = document.getElementById('user-name');
-    
-    if (user) {
-        signInBtn.style.display = 'none';
-        userInfoDiv.style.display = 'flex';
+// NEW: Function to handle family setup
+async function setupFamily(user) {
+    const { data, error } = await supabase.from('user_profiles').select('*').eq('user_id', user.id);
+    if (error) {
+        console.error('Error fetching user profile:', error);
+        return;
+    }
 
-        const profilePicture = user.user_metadata.avatar_url;
-        const userName = user.user_metadata.full_name;
-
-        userAvatar.src = profilePicture;
-        userNameSpan.innerText = userName;
-
+    if (data.length > 0) {
+        currentFamilyId = data[0].family_id;
+        await renderGrid(currentStartDate);
+        await loadNotes();
+        await renderReminders();
     } else {
-        signInBtn.style.display = 'inline-block';
-        userInfoDiv.style.display = 'none';
+        renderFamilyModal();
     }
 }
 
-// NEW: Function to check and set the child's name
+// NEW: Function to render the family setup modal
+function renderFamilyModal() {
+    document.getElementById('family-modal').style.display = 'block';
+    renderFamilyOptions();
+}
+
+// NEW: Function to show initial family options
+function renderFamilyOptions() {
+    document.getElementById('create-family-btn').style.display = 'block';
+    document.getElementById('join-family-btn').style.display = 'block';
+    document.getElementById('join-family-form').style.display = 'none';
+    document.getElementById('family-id-display').style.display = 'none';
+}
+
+// NEW: Function to render the join family form
+function renderJoinFamilyForm() {
+    document.getElementById('create-family-btn').style.display = 'none';
+    document.getElementById('join-family-btn').style.display = 'none';
+    document.getElementById('join-family-form').style.display = 'block';
+}
+
+// NEW: Function to create a new family
+async function createFamily() {
+    const { data: familyData, error: familyError } = await supabase.from('families').insert({}).select();
+    if (familyError) {
+        console.error('Error creating family:', familyError);
+        return;
+    }
+    const newFamilyId = familyData[0].id;
+    const user = (await supabase.auth.getSession()).data.session.user;
+
+    const { error: profileError } = await supabase.from('user_profiles').insert({
+        user_id: user.id,
+        family_id: newFamilyId
+    });
+    if (profileError) {
+        console.error('Error creating user profile:', profileError);
+        return;
+    }
+    currentFamilyId = newFamilyId;
+
+    document.getElementById('family-id-display').style.display = 'block';
+    document.getElementById('family-id-output').value = newFamilyId;
+
+    await renderGrid(currentStartDate);
+    await loadNotes();
+    await renderReminders();
+}
+
+// NEW: Function to join an existing family
+async function joinFamily() {
+    const familyIdInput = document.getElementById('family-id-input').value;
+    const user = (await supabase.auth.getSession()).data.session.user;
+
+    const { data: familyExists, error: familyError } = await supabase.from('families').select('id').eq('id', familyIdInput);
+    if (familyError || familyExists.length === 0) {
+        alert('Invalid Family ID!');
+        return;
+    }
+
+    const { error: profileError } = await supabase.from('user_profiles').insert({
+        user_id: user.id,
+        family_id: familyIdInput
+    });
+    if (profileError) {
+        console.error('Error joining family:', profileError);
+        return;
+    }
+    currentFamilyId = familyIdInput;
+    document.getElementById('family-modal').style.display = 'none';
+
+    await renderGrid(currentStartDate);
+    await loadNotes();
+    await renderReminders();
+}
+
 function setupChildName() {
     const name = localStorage.getItem('childName');
     const nameHeader = document.getElementById('child-name-header');
@@ -140,7 +227,6 @@ function setupChildName() {
     }
 }
 
-// NEW: Function to save the child's name
 function saveChildName() {
     const nameInput = document.getElementById('child-name-input');
     const nameHeader = document.getElementById('child-name-header');
@@ -155,7 +241,6 @@ function saveChildName() {
         alert('Please enter a name!');
     }
 }
-
 
 async function renderGrid(startDate) {
     document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
@@ -203,7 +288,7 @@ async function renderGrid(startDate) {
     table.appendChild(tbody);
     gridContainer.appendChild(table);
     
-    const { data, error } = await supabase.from('homeboard_entries').select('*, reminder_set').in('date', dates);
+    const { data, error } = await supabase.from('homeboard_entries').select('*, reminder_set').in('date', dates).eq('family_id', currentFamilyId);
     if (error) console.error(error);
     if (data) {
         data.forEach(entry => {
@@ -221,7 +306,7 @@ async function renderGrid(startDate) {
 }
 
 async function loadNotes() {
-    let { data, error } = await supabase.from('special_notes').select('*').eq('id', 1);
+    let { data, error } = await supabase.from('special_notes').select('*').eq('id', 1).eq('family_id', currentFamilyId);
     if (error) console.error(error);
     if (data && data.length > 0) {
         document.getElementById('notes-content').innerText = data[0].content || 'Enter notes...';
@@ -242,12 +327,12 @@ async function saveEntry() {
     }
 
     if (date === 'notes') {
-        const { error } = await supabase.from('special_notes').upsert({ id: 1, content: content || 'Enter notes...' }, { onConflict: 'id' });
+        const { error } = await supabase.from('special_notes').upsert({ id: 1, content: content || 'Enter notes...', family_id: currentFamilyId }, { onConflict: 'id' });
         if (error) console.error(error);
         document.getElementById('notes-content').innerText = content || 'Enter notes...';
     } else {
         const reminderSet = document.getElementById('set-reminder').checked;
-        const { error } = await supabase.from('homeboard_entries').upsert({ date, content, type, reminder_set: reminderSet }, { onConflict: 'date' });
+        const { error } = await supabase.from('homeboard_entries').upsert({ date, content, type, reminder_set: reminderSet, family_id: currentFamilyId }, { onConflict: 'date' });
         if (error) console.error(error);
         const cell = document.querySelector(`.cell[data-date="${date}"]`);
         if (cell) {
@@ -267,6 +352,7 @@ async function renderReminders() {
     const { data, error } = await supabase
         .from('homeboard_entries')
         .select('date, content, type, reminder_set')
+        .eq('family_id', currentFamilyId)
         .or('type.eq.exam,type.eq.test')
         .order('date', { ascending: true });
 
