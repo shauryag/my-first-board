@@ -67,7 +67,6 @@ function renderFamilyOptions() {
   document.getElementById('create-family-btn').style.display = 'block';
   document.getElementById('join-family-btn').style.display = 'block';
   document.getElementById('join-family-form').style.display = 'none';
-  document.getElementById('family-id-display').style.display = 'none';
 }
 
 function renderJoinFamilyForm() {
@@ -90,13 +89,22 @@ async function createFamily() {
   });
 
   currentFamilyId = newFamilyId;
-  document.getElementById('family-modal').style.display = 'none';
 
+  // 🔹 Sync local child name to DB if exists
+  const localName = localStorage.getItem('childName');
+  if (localName) {
+    await supabase.from('families')
+      .update({ child_name: localName })
+      .eq('id', currentFamilyId);
+    document.getElementById('child-name-header').innerText = localName;
+  } else {
+    document.getElementById('name-modal').style.display = 'block';
+  }
+
+  document.getElementById('family-modal').style.display = 'none';
   await renderGrid(currentStartDate);
   await loadNotes();
   await renderReminders();
-
-  document.getElementById('name-modal').style.display = 'block';
 }
 
 async function joinFamily() {
@@ -115,16 +123,28 @@ async function joinFamily() {
   });
 
   currentFamilyId = familyIdInput;
-  document.getElementById('family-modal').style.display = 'none';
 
-  const { data: famRow } = await supabase.from('families').select('child_name').eq('id', currentFamilyId).single();
-  if (famRow?.child_name) {
-    localStorage.setItem('childName', famRow.child_name);
-    document.getElementById('child-name-header').innerText = famRow.child_name;
+  // 🔹 Sync local child name if present, otherwise fetch from DB
+  const localName = localStorage.getItem('childName');
+  if (localName) {
+    await supabase.from('families')
+      .update({ child_name: localName })
+      .eq('id', currentFamilyId);
+    document.getElementById('child-name-header').innerText = localName;
   } else {
-    document.getElementById('name-modal').style.display = 'block';
+    const { data: famRow } = await supabase.from('families')
+      .select('child_name')
+      .eq('id', currentFamilyId)
+      .single();
+    if (famRow?.child_name) {
+      localStorage.setItem('childName', famRow.child_name);
+      document.getElementById('child-name-header').innerText = famRow.child_name;
+    } else {
+      document.getElementById('name-modal').style.display = 'block';
+    }
   }
 
+  document.getElementById('family-modal').style.display = 'none';
   await renderGrid(currentStartDate);
   await loadNotes();
   await renderReminders();
