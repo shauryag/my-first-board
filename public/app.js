@@ -327,6 +327,11 @@ async function init() {
         renderGrid(currentStartDate);
     });
 
+    document.getElementById('startDate').addEventListener('change', (e) => {
+        currentStartDate = new Date(e.target.value);
+        renderGrid(currentStartDate);
+    });
+
     const modal = document.getElementById('modal');
     document.getElementById('cancel').addEventListener('click', () => modal.style.display = 'none');
     document.getElementById('save').addEventListener('click', saveEntry);
