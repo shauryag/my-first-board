@@ -294,14 +294,19 @@ async function init() {
 
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
+    console.log('✅ User is logged in.');
     await refreshUI(session.user);
     await setupFamily(session.user);
   } else {
+    console.log('❌ User is NOT logged in.');
     await refreshUI(null);
     const localName = localStorage.getItem('childName');
+    console.log('Local storage item for childName:', localName);
     if (!localName) {
+      console.log('No local name found, attempting to show modal.');
       document.getElementById('name-modal').style.display = 'block';
     } else {
+      console.log('Local name found, updating header.');  
       document.getElementById('child-name-header').innerText = localName;
     }
   }
