@@ -26,6 +26,16 @@ function updateUI(user) {
   }
 }
 
+// NEW: unified refresh function to replace direct updateUI calls
+async function refreshUI(user) {
+  updateUI(user);
+  await renderGrid(currentStartDate);
+  if (currentFamilyId) {
+    await loadNotes();
+    await renderReminders();
+  }
+}
+
 function setupChildNameLocal() {
   const name = localStorage.getItem('childName');
   const header = document.getElementById('child-name-header');
@@ -90,7 +100,6 @@ async function createFamily() {
 
   currentFamilyId = newFamilyId;
 
-  // 🔹 Sync local child name to DB if exists
   const localName = localStorage.getItem('childName');
   if (localName) {
     await supabase.from('families')
@@ -102,9 +111,7 @@ async function createFamily() {
   }
 
   document.getElementById('family-modal').style.display = 'none';
-  await renderGrid(currentStartDate);
-  await loadNotes();
-  await renderReminders();
+  await refreshUI(session.user);
 }
 
 async function joinFamily() {
@@ -124,7 +131,6 @@ async function joinFamily() {
 
   currentFamilyId = familyIdInput;
 
-  // 🔹 Sync local child name if present, otherwise fetch from DB
   const localName = localStorage.getItem('childName');
   if (localName) {
     await supabase.from('families')
@@ -145,9 +151,7 @@ async function joinFamily() {
   }
 
   document.getElementById('family-modal').style.display = 'none';
-  await renderGrid(currentStartDate);
-  await loadNotes();
-  await renderReminders();
+  await refreshUI(session.user);
 }
 
 async function setupFamily(user) {
@@ -161,9 +165,7 @@ async function setupFamily(user) {
     } else {
       setupChildNameLocal();
     }
-    await renderGrid(currentStartDate);
-    await loadNotes();
-    await renderReminders();
+    await refreshUI(user);
   } else {
     showFamilyModal();
     const localName = localStorage.getItem('childName');
@@ -292,10 +294,10 @@ async function init() {
 
   const { data: { session } } = await supabase.auth.getSession();
   if (session) {
-    updateUI(session.user);
+    await refreshUI(session.user);
     await setupFamily(session.user);
   } else {
-    updateUI(null);
+    await refreshUI(null);
     const localName = localStorage.getItem('childName');
     if (!localName) {
       document.getElementById('name-modal').style.display = 'block';
@@ -306,12 +308,11 @@ async function init() {
 
   supabase.auth.onAuthStateChange(async (_event, sess) => {
     if (sess) {
-      updateUI(sess.user);
+      await refreshUI(sess.user);
       await setupFamily(sess.user);
     } else {
-      updateUI(null);
+      await refreshUI(null);
       currentFamilyId = null;
-      await renderGrid(currentStartDate);
     }
   });
 
