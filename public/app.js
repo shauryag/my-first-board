@@ -196,13 +196,7 @@ async function renderGrid(startDate) {
             td.classList.add('cell');
             td.dataset.date = dateStr;
             td.innerHTML = `<div class="date-label">${cellDate.getDate()}</div><div class="content"></div>`;
-            tr.appendChild(td);
-            const dow = cellDate.getDay();
-  if (dow === 0 || dow === 6) {
-    td.classList.add('weekend');
-  }
-
-  tr.appendChild(td);
+            tr.appendChild(td);  
 }
 
 day.textContent = date.getDate();

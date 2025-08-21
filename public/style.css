@@ -249,13 +249,3 @@ th {
 #reminder-label input[type="checkbox"] {
     margin-right: 10px;
 }
-/* Weekends (Sat + Sun) */
-.cell.weekend {
-  background: #ffe9c6;   /* soft peach */
-  color: #2c2000;        /* readable text */
-}
-
-/* Optional: keep hover subtle on weekends */
-.cell.weekend:hover {
-  filter: brightness(0.98);
-}
